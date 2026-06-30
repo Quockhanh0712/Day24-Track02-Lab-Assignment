@@ -134,6 +134,14 @@ class MedVietAnonymizer:
 
         for col in pii_columns:
             for value in original_df[col].astype(str):
+                # Xử lý các giá trị bị mất số 0 đầu do ép kiểu số trong pandas
+                if value.endswith(".0"):
+                    value = value[:-2]
+                if col == "cccd":
+                    value = value.zfill(12)
+                elif col == "so_dien_thoai":
+                    value = value.zfill(10)
+                
                 total += 1
                 results = detect_pii(value, self.analyzer)
                 if len(results) > 0:

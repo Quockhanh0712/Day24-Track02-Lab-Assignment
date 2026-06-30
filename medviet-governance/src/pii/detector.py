@@ -16,6 +16,7 @@ def build_vietnamese_analyzer() -> AnalyzerEngine:
     )
     cccd_recognizer = PatternRecognizer(
         supported_entity="VN_CCCD",
+        supported_language="vi",
         patterns=[cccd_pattern],
         context=["cccd", "căn cước", "chứng minh", "cmnd"]
     )
@@ -24,6 +25,7 @@ def build_vietnamese_analyzer() -> AnalyzerEngine:
     # Tạo phone recognizer: số điện thoại VN (0[3|5|7|8|9]xxxxxxxx)
     phone_recognizer = PatternRecognizer(
         supported_entity="VN_PHONE",
+        supported_language="vi",
         patterns=[Pattern(
             name="vn_phone",
             regex=r"\b0[35789]\d{8}\b",      # Regex VN phone
