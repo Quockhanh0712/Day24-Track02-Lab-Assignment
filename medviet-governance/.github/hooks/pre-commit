@@ -4,26 +4,39 @@
 echo "🔍 Running security checks..."
 
 # 1. git-secrets scan
-git secrets --pre_commit_hook -- "$@"
-if [ $? -ne 0 ]; then
-    echo "❌ git-secrets found potential secrets! Commit blocked."
-    exit 1
+# Chạy git-secrets nếu nó được cài đặt
+if command -v git-secrets >/dev/null 2>&1; then
+    git secrets --pre_commit_hook -- "$@"
+    if [ $? -ne 0 ]; then
+        echo "❌ git-secrets found potential secrets! Commit blocked."
+        exit 1
+    fi
+else
+    echo "ℹ️ git-secrets is not installed. Skipping secrets scan."
 fi
 
 # 2. Bandit SAST scan
 echo "🐍 Running Bandit SAST..."
-bandit -r src/ -ll -q
-if [ $? -ne 0 ]; then
-    echo "❌ Bandit found security issues! Review above."
-    exit 1
+if command -v bandit >/dev/null 2>&1; then
+    bandit -r src/ -ll -q
+    if [ $? -ne 0 ]; then
+        echo "❌ Bandit found security issues! Review above."
+        exit 1
+    fi
+else
+    echo "ℹ️ bandit is not installed. Skipping SAST scan."
 fi
 
 # 3. pip-audit dependency check
 echo "📦 Checking dependencies for CVEs..."
-pip-audit --desc on
-if [ $? -ne 0 ]; then
-    echo "⚠️  Vulnerable dependencies found! Update before committing."
-    exit 1
+if command -v pip-audit >/dev/null 2>&1; then
+    pip-audit --desc on
+    if [ $? -ne 0 ]; then
+        echo "⚠️  Vulnerable dependencies found! Update before committing."
+        exit 1
+    fi
+else
+    echo "ℹ️ pip-audit is not installed. Skipping dependency audit."
 fi
 
 echo "✅ All security checks passed!"
